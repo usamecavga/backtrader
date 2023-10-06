@@ -846,7 +846,10 @@ class BackBroker(bt.BrokerBase):
 
     def notify(self, order):
         self.notifs.append(order.clone())
-
+    
+    def _try_exec_simulated(self, order):
+        self._execute(order, ago=0, price=order.created.price)
+    
     def _try_exec_historical(self, order):
         self._execute(order, ago=0, price=order.created.price)
 
@@ -1077,6 +1080,9 @@ class BackBroker(bt.BrokerBase):
                                      popen, phigh, plow, pclose,
                                      pcreated, plimit)
 
+        elif order.exectype == Order.Simulated:
+            self._try_exec_simulated(order)
+        
         elif order.exectype == Order.Historical:
             self._try_exec_historical(order)
 
